@@ -28,8 +28,8 @@ firebase.initializeApp({
 export default class App extends Component{
   render() {
     return (
-      <Provider store = {createStore(reducers)}>
-     <LoginForm/>
+      <Provider store={createStore(reducers)}>
+        <LoginForm/>
       </Provider>
     );
   }
