@@ -1,49 +1,48 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, ScrollView, StatusBar, TextInput, Button } from 'react-native';
+import { Text, ActivityIndicator } from 'react-native';
 import { connect } from "react-redux";
-import { emailChanged, passwordChanged, signedIn, signedOut } from "../actions";
-import fireBase from 'firebase';
+import { emailChanged, passwordChanged, loginUser } from "../actions";
+import { CustomButton, Card, CardSection, Input } from './common';
 
-class LoginForm extends Component { 
-    emailChange = (text) => this.props.dispatch(emailChanged(text))
-    passwordChanged = (text) => this.props.dispatch(passwordChanged(text))
+class LoginForm extends Component {
+    emailChange = (text) => this.props.emailChanged(text)
+    passwordChanged = (text) => this.props.passwordChanged(text)
     login = () => {
-        fireBase.auth().createUserWithEmailAndPassword(this.props.login.email, this.props.login.password)
-            .then(this.successLogin)
-            .catch(this.failedLogin)
+        this.props.loginUser(this.props)
     };
-    successLogin = (successfull) => {
-        this.props.dispatch(signedIn())
-    }
-
-    failedLogin = (error) => {
-        alert(error)
-    }
-
-    signout = () => {
-        this.props.dispatch(signedOut())
-    }
 
     render() {
         return (
-            <ScrollView style={{ backgroundColor: "pink", flex: 1 }}>
-                <StatusBar backgroundColor="purple" /> 
-                {!this.props.login.isLoggedIn ? <View style={{ backgroundColor: "gray", marginTop: 30 }}>
-                    <Text style={{ color: "purple", fontSize: 40, fontWeight: "bold", textAlign: "center" }}>Login</Text>
-                    <TextInput placeholder="Email" placeholderTextColor="black" style={{ fontSize: 30, backgroundColor: "white" }} onChangeText={this.emailChange} />
-                    <TextInput placeholder="Password" placeholderTextColor="black" secureTextEntry={true} style={{ backgroundColor: "white", fontSize: 30, marginTop: 10 }} onChangeText={this.passwordChanged} />
-                    <Button title="Login" onPress={this.login} />
-                </View>
-                :
-                <View>
-                    <Button title="Sign Out" onPress={this.signout} />
-                </View>
-                }
-            </ScrollView>
-        );
+            <Card>
+                <CardSection>
+                    <Input label="Email" placeholder="user@email.com" onChangeText={this.emailChange} value={this.props.email} />
+                </CardSection>
+                <CardSection>
+                    <Input secureTextEntry label="Password" placeholder="Password" onChangeText={this.passwordChanged} value={this.props.password} />
+                </CardSection>
+                <CardSection>
+                    {this.props.loading ? <ActivityIndicator size={50} color="purple" /> : <CustomButton onPress={this.login}>Login</CustomButton>}
+                </CardSection>
+                {this.props.error ?
+                    <CardSection>
+                        <Text style={{ color: "blue", fontSize: 25, margin: 10, textAlign: "center" }}>{this.props.error}</Text>
+                    </CardSection>
+                : null}
+            </Card>
+        )
     }
 }
-const mapStateToProps = (state) => {
-    return state
+const mapStateToProps = ({ auth }) => {
+    return {
+        email: auth.email,
+        password: auth.password,
+        loading: auth.loading,
+        error: auth.error,
+        user: auth.user
+    };
 }
-export default connect(mapStateToProps)(LoginForm); 
+export default connect(mapStateToProps, {
+    emailChanged,
+    passwordChanged,
+    loginUser
+})(LoginForm); 

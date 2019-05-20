@@ -1,19 +1,10 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
 import {Provider} from 'react-redux';
-import {createStore} from 'redux';
+import {createStore,applyMiddleware} from 'redux';
 import firebase from 'firebase';
-import reducers from "./reducers"
-import LoginForm from './components/LoginForm';
-
+import reducers from "./reducers" 
+import ReduxThunk from 'redux-thunk';
+import Router from './Router';  
 
 firebase.initializeApp({
   apiKey: "AIzaSyA8xy8-B6Jr3tOTByKgVUu9qNy9-aLm_RQ",
@@ -28,8 +19,8 @@ firebase.initializeApp({
 export default class App extends Component{
   render() {
     return (
-      <Provider store={createStore(reducers)}>
-        <LoginForm/>
+      <Provider store={createStore(reducers,{},applyMiddleware(ReduxThunk))}>
+        <Router />
       </Provider>
     );
   }
