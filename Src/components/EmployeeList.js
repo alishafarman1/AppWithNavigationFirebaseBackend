@@ -1,18 +1,41 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
+import { CustomButton, Card, CardSection, Input, SelectBox } from './common';
+import { connect } from 'react-redux';
+import { loadEmployees } from "../actions";
 
-export default class EmployeeList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
+class EmployeeList extends Component {
+  componentDidMount() {
+    this.props.loadEmployees();
   }
 
   render() {
     return (
-      <View>
-        <Text> EmployeeList </Text>
-      </View>
+      <ScrollView style={{ flex: 1 }}>
+
+        {Object.keys(this.props.employees).map((key, index) => (
+          <Card>
+            <CardSection>
+              <View>
+                <Text>{this.props.employees[key].name}</Text>
+                <Text>{this.props.employees[key].phone}</Text>
+                <Text>{this.props.employees[key].shift}</Text>
+              </View>
+            </CardSection>
+          </Card>
+        ))}
+      </ScrollView>
     );
   }
 }
+
+const mapStateToProps = ({ employeeForm }) => {
+  const { employees } = employeeForm;
+  return { employees };
+};
+
+export default connect(
+  mapStateToProps,
+  { loadEmployees }
+)(EmployeeList);
+

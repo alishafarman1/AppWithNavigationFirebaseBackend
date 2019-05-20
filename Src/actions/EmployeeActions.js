@@ -1,4 +1,4 @@
-import { EMPLOYEE_UPDATE,EMPLOYEE_SUCCESS,EMPLOYEE_FAILED } from "./types";
+import { EMPLOYEE_UPDATE,EMPLOYEE_SUCCESS,EMPLOYEE_FAILED,LOAD_ALL_EMPLOYEES } from "./types";
 import { Actions } from "react-native-router-flux";
 import firebase from 'firebase';
 
@@ -16,6 +16,7 @@ const employeeSuccess =
             payload: employee
         });
         Actions.main();
+        loadEmployees()(dispatch)
 };
 
 const employeeError =
@@ -41,3 +42,21 @@ export const addEmployee = ({ name,phone,shift }) => {
             });
     };
 };
+
+export const loadEmployees = () =>{
+    return dispatch => { 
+        firebase
+            .database()
+            .ref("users").once('value')
+            .then((data) => {
+                dispatch({
+                    type:LOAD_ALL_EMPLOYEES,
+                    payload:data.val()
+                })
+            })
+            .catch((dbError) => {
+                alert(dbError)
+                employeeError(dispatch, dbError)
+            });
+    };
+}
